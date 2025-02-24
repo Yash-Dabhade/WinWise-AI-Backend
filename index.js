@@ -211,6 +211,7 @@ app.post("/generate-proposal", async (req, res) => {
 app.post("/analyze-outcome", async (req, res) => {
   try {
     const newProposal = req.body;
+
     const apiKey = process.env.IBM_API_KEY;
 
     const iamToken = await getIAMToken(apiKey);
@@ -259,6 +260,7 @@ app.post("/analyze-outcome", async (req, res) => {
 app.post("/analyze-proposal", async (req, res) => {
   try {
     const { proposalText } = req.body;
+    const truncatedText = proposalText.substring(0, 512);
     const apiKey = process.env.IBM_API_KEY;
 
     const iamToken = await getIAMToken(apiKey);
@@ -266,7 +268,7 @@ app.post("/analyze-proposal", async (req, res) => {
     const allPractices = Object.values(knowledgeBase).flat();
 
     const proposalEmbeddingResult = await getEmbeddings(
-      [proposalText],
+      [truncatedText],
       iamToken
     );
     const knowledgeBaseEmbeddingResult = await getEmbeddings(
@@ -298,7 +300,7 @@ app.post("/analyze-proposal", async (req, res) => {
 ${topPractices.map((p) => `- ${p.text}`).join("\n")}
 
 Proposal to analyze:
-${proposalText}
+${truncatedText}
 
 Provide a comprehensive analysis in this format:
 
